@@ -1,0 +1,202 @@
+一、交易基础与执行信息
+指标字段	说明 / 口径	横向对比用途
+trade_id	交易唯一编号	索引
+side	多 / 空	分组对比多空表现
+entry_time	开仓时间	时段归因
+exit_time	平仓时间	时段归因
+holding_minutes	持仓分钟数	持仓时长分析
+holding_1h_bars	持仓期间经过的 1H K 线根数	持仓周期分析
+entry_price	开仓价	基础
+exit_price	平仓价	基础
+quantity	交易数量	基础
+notional_value	名义金额	风险暴露
+fee	手续费总额	成本分析
+slippage_total	开平仓滑点合计	执行质量
+entry_trigger_type	入场触发：突破 / 回撤 / 反转 / 趋势跟随 / 区间	信号类型归因
+exit_trigger_type	出场触发：止损 / 止盈 / 信号反向 / 移动止损 / 时间退出 / 手动	出场归因
+is_overnight	是否隔夜	隔夜风险
+is_weekend	是否跨周末	跳空风险
+二、收益与风险绩效
+指标字段	说明 / 口径	横向对比用途
+gross_pnl	毛盈亏	基础
+net_pnl	净盈亏，扣除手续费与滑点	核心绩效
+return_pct	净收益率，净盈亏 / 名义金额	横向收益对比
+log_return	对数收益	统计分布分析
+r_multiple	净盈亏 / 初始风险金额	风险收益质量
+initial_risk_amount	入场价与初始止损价差额 × 数量	风险暴露
+initial_risk_pct	初始风险占账户权益比例	仓位风险
+initial_stop_distance_pct	入场价到初始止损的距离百分比	止损宽度
+initial_stop_distance_atr	入场价到初始止损距离 / 入场时 1H ATR	止损是否合理
+mfe_price / mfe_pct	最大有利偏移：持仓期间最大浮盈价格 / 百分比	盈利空间
+mfe_atr	最大有利偏移 / 入场时 1H ATR	标准化盈利空间
+mfe_r	最大有利偏移 / 初始风险金额	盈利空间 R 倍数
+mae_price / mae_pct	最大不利偏移：持仓期间最大浮亏价格 / 百分比	最大痛苦
+mae_atr	最大不利偏移 / 入场时 1H ATR	标准化亏损空间
+mae_r	最大不利偏移 / 初始风险金额	亏损空间 R 倍数
+mfe_mae_ratio	MFE / MAE	持仓体验
+max_holding_dd_pct	持仓期间最大回撤百分比	单笔回撤
+net_pnl_over_mfe	净盈亏 / MFE	盈利转化效率
+net_pnl_over_mae	净盈亏 / MAE	风险回报比
+net_pnl_per_holding_bar	净盈亏 / 持仓 1H K 线数	时间效率
+net_pnl_per_atr	净盈亏 / 入场时 1H ATR	波动率调整收益
+fee_pct_of_gross	手续费 / 毛盈亏	成本敏感度
+slippage_pct_of_gross	滑点 / 毛盈亏	执行质量
+is_win	是否盈利	胜率统计
+profit_contribution	该笔对整体样本利润的贡献	利润归因
+sample_zscore_net_pnl	该笔净盈亏在全部交易中的标准化得分	极端交易识别
+三、入场快照：1H 主级别趋势与动量
+指标字段	说明 / 口径	横向对比用途
+entry_1h_ma5_slope	入场时 1H MA5 斜率，可用最近 N 根收盘价线性回归斜率 / ATR 标准化	短期趋势
+entry_1h_ma20_slope	入场时 1H MA20 斜率	中期趋势
+entry_1h_ma50_slope	入场时 1H MA50 斜率	长期趋势
+entry_1h_ma200_slope	入场时 1H MA200 斜率	长期趋势
+entry_1h_ma_arrangement	MA5/20/50/200 多头、空头、纠缠	趋势结构
+entry_1h_price_dist_ma20	入场价相对 1H MA20 的偏离百分比	均值回归压力
+entry_1h_price_dist_ma50	入场价相对 1H MA50 的偏离百分比	长期偏离
+entry_1h_price_dist_ma200	入场价相对 1H MA200 的偏离百分比	极端偏离
+entry_1h_adx	入场时 1H ADX 值	趋势强度
+entry_1h_di_plus	入场时 1H +DI	多空力量
+entry_1h_di_minus	入场时 1H -DI	多空力量
+entry_1h_di_diff	入场时 1H +DI 减 -DI	方向强度
+entry_1h_rsi14	入场时 1H RSI(14)	超买超卖
+entry_1h_rsi_state	RSI 区间标签：超卖 / 中性 / 超买	状态归因
+entry_1h_macd_hist	入场时 1H MACD 柱值	动量
+entry_1h_macd_signal_gap	入场时 1H MACD 线与信号线差值	动量变化
+entry_1h_macd_zero_cross	入场时 MACD 线是否在零轴上方 / 下方	多空背景
+entry_1h_macd_slope	入场时 1H MACD 柱斜率	动量加速
+entry_1h_bb_position	入场价在 1H 布林带中的位置 %B	通道位置
+entry_1h_bb_width_pct	入场时 1H 布林带宽度 / 价格	波动率环境
+entry_1h_atr14	入场时 1H ATR(14) 绝对值	波动率
+entry_1h_atr14_pct	入场时 1H ATR(14) / 价格	标准化波动率
+entry_1h_hv20	入场时 1H 20 周期年化历史波动率	波动率环境
+entry_1h_volume_ratio	入场时 1H 成交量 / 过去 20 根 1H 均量	量能确认
+entry_1h_obv_slope	入场时 1H OBV 斜率	量价配合
+entry_1h_vwap_dist_pct	入场价相对 1H 区间 VWAP 偏离	盘中均价
+entry_1h_price_percentile_20	入场价处于过去 20 根 1H K 线高低点的位置，0-100%	结构位置
+entry_1h_bias_ma20	入场时 1H BIAS：(价格-MA20)/MA20	偏离度
+entry_1h_trend_strength_score	综合 ADX、均线排列、MACD 的 1H 趋势评分	趋势评分
+entry_1h_kline_pattern	入场时 1H K 线形态：吞没 / Pin Bar / Inside Bar 等	形态归因
+四、入场快照：4H 辅助级别
+指标字段	说明 / 口径	横向对比用途
+entry_4h_ma20_slope	入场时 4H MA20 斜率	中期背景
+entry_4h_ma50_slope	入场时 4H MA50 斜率	长期背景
+entry_4h_ma_arrangement	4H MA20/50 排列	趋势结构
+entry_4h_price_dist_ma20	入场价相对 4H MA20 偏离	均值回归
+entry_4h_price_dist_ma50	入场价相对 4H MA50 偏离	趋势偏离
+entry_4h_adx	入场时 4H ADX	趋势强度
+entry_4h_di_diff	入场时 4H +DI 减 -DI	方向强度
+entry_4h_rsi14	入场时 4H RSI(14)	超买超卖
+entry_4h_macd_hist	入场时 4H MACD 柱值	中期动量
+entry_4h_macd_signal_gap	入场时 4H MACD 与信号线差	动量变化
+entry_4h_macd_zero_cross	4H MACD 位于零轴上方 / 下方	中期多空
+entry_4h_bb_position	4H 布林带位置 %B	通道位置
+entry_4h_atr14_pct	入场时 4H ATR(14) / 价格	波动率
+entry_4h_volume_ratio	入场时 4H 成交量 / 20 均量	量能背景
+entry_4h_trend_state	4H 趋势状态：强趋势 / 弱趋势 / 震荡	背景标签
+entry_4h_breakout_dist_atr	入场价距离最近 4H 前高/前低突破位的 ATR 倍数	突破质量
+五、入场快照：15M 辅助级别
+指标字段	说明 / 口径	横向对比用途
+entry_15m_ma20_slope	入场时 15M MA20 斜率	短期节奏
+entry_15m_ma_arrangement	15M MA5/20/50 排列	短期结构
+entry_15m_price_dist_ma20	入场价相对 15M MA20 偏离	短期偏离
+entry_15m_rsi14	入场时 15M RSI(14)	短期超买超卖
+entry_15m_macd_hist	入场时 15M MACD 柱值	短期动量
+entry_15m_bb_position	15M 布林带位置 %B	短期通道
+entry_15m_atr14_pct	入场时 15M ATR(14) / 价格	短期波动率
+entry_15m_volume_ratio	入场时 15M 成交量 / 20 均量	短期量能
+entry_15m_trigger_type	15M 触发类型：突破 / 回踩 / 反转 / 二次确认	微观结构
+entry_15m_confirmation_bars	15M 信号出现后确认 K 线数	信号质量
+六、多周期共振与一致性
+指标字段	说明 / 口径	横向对比用途
+align_4h_1h	4H 与 1H 趋势方向是否一致：1 / 0 / -1	多周期过滤
+align_15m_1h	15M 与 1H 方向是否一致：1 / 0 / -1	入场确认
+align_all_score	4H、1H、15M 方向共振评分，建议 -3 ~ +3	核心共振指标
+align_4h_1h_adx	4H 与 1H 是否同时 ADX > 20/25	强趋势共振
+align_macd_hist_sign	4H、1H、15M MACD 柱符号一致性	动量共振
+align_price_ma50	4H 与 1H 是否同时价格在 MA50 上方/下方	趋势背景
+align_1h_15m_rsi	1H 与 15M RSI 是否同向	短期共振
+align_breakout_4h	1H 入场突破是否处于 4H 关键位突破	级别联动
+mtf_conflict_flag	是否存在 4H 逆势、15M 顺势的冲突	矛盾信号
+七、支撑阻力与市场结构
+指标字段	说明 / 口径	横向对比用途
+entry_support_dist_atr	入场价距最近有效支撑的 ATR 倍数	下方空间
+entry_resistance_dist_atr	入场价距最近有效阻力的 ATR 倍数	上方空间
+entry_nearest_sr_type	最近关键位类型：前高 / 前低 / 成交密集区 / 整数关	结构类型
+entry_position_in_20b_range	入场价在过去 20 根 1H K 线高低点中的位置 0-100%	位置优劣
+entry_high_20_1h	入场前 20 根 1H K 线最高价	突破参照
+entry_low_20_1h	入场前 20 根 1H K 线最低价	突破参照
+entry_breakout_retest	入场是否为突破后回踩确认：0/1	结构质量
+entry_inside_bar_parent_range	若为 inside bar 突破，母 K 线振幅 / ATR	形态波动
+entry_at_key_level	是否在关键支撑/阻力位上开仓：0/1	位置过滤
+八、持仓过程质量
+指标字段	说明 / 口径	横向对比用途
+holding_1h_range_pct	持仓期间最高价与最低价区间 / 入场价	路径波动
+first_plus_0_5r_bars	首次达到 +0.5R 经过的 1H K 线数	盈利速度
+first_plus_1r_bars	首次达到 +1R 经过的 1H K 线数	盈利速度
+first_plus_2r_bars	首次达到 +2R 经过的 1H K 线数	趋势延续
+first_minus_0_5r_bars	首次达到 -0.5R 经过的 1H K 线数	风险暴露速度
+first_minus_1r_bars	首次达到 -1R 经过的 1H K 线数	止损速度
+reached_plus_1r	是否达到 +1R	目标达成
+reached_plus_2r	是否达到 +2R	高盈亏空间
+reached_plus_3r	是否达到 +3R	趋势质量
+reached_minus_1r	是否触及 -1R	止损深度
+max_runup_pct	持仓期间最大浮盈百分比	盈利潜力
+max_drawdown_pct	持仓期间最大浮亏百分比	痛苦指标
+giveback_pct	从 MFE 到平仓盈亏的回撤百分比	盈利回吐
+recovery_from_mae_pct	从 MAE 到平仓盈亏恢复的百分比	反转能力
+adverse_signal_count_1h	持仓期间 1H 出现反向信号的次数	噪音干扰
+adverse_signal_count_15m	持仓期间 15M 出现反向信号的次数	短周期干扰
+trend_flip_1h_during	持仓期间 1H 趋势是否发生翻转	持仓逻辑变化
+trend_flip_4h_during	持仓期间 4H 趋势是否发生翻转	级别逻辑变化
+holding_avg_atr_pct	持仓期间 1H ATR/价格的均值	过程波动率
+holding_vol_change_pct	持仓期间 ATR 相对入场时变化百分比	波动率变化
+trailing_stop_hit_count	持仓期间移动止损被触及次数	趋势震荡
+breakeven_stop_hit_count	保本止损被触及次数	保护效率
+path_efficiency	净盈亏 / MFE	路径效率
+time_efficiency	净盈亏 / 持仓 1H K 线数	时间效率
+九、出场快照与出场质量
+指标字段	说明 / 口径	横向对比用途
+exit_1h_ma20_slope	出场时 1H MA20 斜率	出场趋势
+exit_1h_ma_arrangement	出场时 1H MA排列	出场结构
+exit_1h_price_dist_ma20	出场价相对 1H MA20 偏离	出场位置
+exit_1h_rsi14	出场时 1H RSI(14)	出场情绪
+exit_1h_macd_hist	出场时 1H MACD 柱值	出场动量
+exit_1h_atr14_pct	出场时 1H ATR/价格	出场波动率
+exit_1h_bb_position	出场时 1H 布林带 %B	出场通道位置
+exit_1h_volume_ratio	出场时 1H 成交量比	出场量能
+exit_4h_rsi14	出场时 4H RSI	中期状态
+exit_4h_macd_hist	出场时 4H MACD 柱	中期动量
+exit_15m_rsi14	出场时 15M RSI	短期状态
+exit_15m_macd_hist	出场时 15M MACD 柱	短期动量
+exit_reason	初始止损 / 移动止损 / 信号反向 / 目标止盈 / 时间退出 / 手动	归因
+exit_efficiency	净盈亏 / MFE	出场效率
+exit_price_position_in_range	出场价在持仓期间最高/最低价区间中的位置，0-100%	是否出在极值
+bars_after_exit_1h_change_pct	出场后 1H K 线收盘价相对出场价变化	是否出场过早
+bars_after_exit_4h_change_pct	出场后 4H K 线收盘价相对出场价变化	中期出场质量
+exited_at_extreme_flag	是否在持仓最高/最低点附近出场	出场择时
+exit_divergence_flag	出场时是否存在 MACD/RSI 背离	反转信号
+十、市场环境与标签
+指标字段	说明 / 口径	横向对比用途
+session_entry	开仓时段：亚洲 / 欧洲 / 美洲	时段效应
+session_exit	平仓时段	时段效应
+day_of_week_entry	开仓星期	日历效应
+month_entry	开仓月份	季节性
+spread_entry_pct	开仓时点差 / 价格	成本环境
+spread_exit_pct	平仓时点差 / 价格	成本环境
+daily_atr_percentile	入场时 1H ATR 在其近期分布中的分位数	波动率环境
+regime_1h	入场时 1H 市场状态：趋势 / 震荡	状态标签
+regime_4h	入场时 4H 市场状态：趋势 / 震荡	背景标签
+volatility_regime	高波 / 中波 / 低波，按 ATR 分位	波动率标签
+liquidity_regime	高流动性 / 低流动性，按成交量比	流动性标签
+news_high_impact_flag	是否处于高影响数据/事件窗口，若可获取	事件过滤
+十一、可选的综合评分与衍生指标
+指标字段	说明 / 口径	横向对比用途
+entry_score_composite	多个入场维度加权：趋势、动量、量能、位置	综合入场质量
+exit_score_composite	出场时趋势、动量、位置综合评分	综合出场质量
+signal_quality_score	入场信号共振数量、结构质量评分	信号优劣
+multi_timeframe_score	4H/1H/15M 一致性与强度评分	级别共振
+risk_adjusted_entry_score	入场评分 / 初始风险 ATR	风险调整信号
+efficiency_score	综合 MFE 转化、MAE 控制、时间效率	单笔整体效率
+outlier_flag	是否属于净盈亏或 R 倍数极端离群值	异常交易
+sample_percentile_net_pnl	该笔净盈亏在全部样本中的分位数	绩效排序
+sample_percentile_r	该笔 R 倍数在全部样本中的分位数	风险收益排序

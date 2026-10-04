@@ -1,0 +1,46 @@
+# ============================================================
+# 只提交"源码 + 配置模板 + 文档"，其余留在本地磁盘。
+# 如果本目录被单独初始化为 git 仓库，这份规则同样够用。
+# ============================================================
+
+# ---------- 密钥 ----------
+APIserverKey.txt
+APIserverKey.local.txt
+.env
+.env.*
+!.env.example
+*.vault.json
+
+# ---------- Python 缓存 / 虚拟环境 ----------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# ---------- Node / Electron ----------
+node_modules/
+dist/
+desktop/.vite/
+
+# ---------- 数据库与日志 ----------
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+*.log
+backend/data/
+
+# ---------- 本地行情 / 回测 / 超参数据 ----------
+user_data/data/
+user_data/logs/
+user_data/backtest_results/
+user_data/backtest_exports/
+user_data/hyperopt_results/
+user_data/liquidation/
+user_data/factors/
+user_data/plot/
+user_data/notebooks/

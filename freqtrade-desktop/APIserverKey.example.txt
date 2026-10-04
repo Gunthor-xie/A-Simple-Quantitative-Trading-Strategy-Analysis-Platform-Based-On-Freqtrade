@@ -1,0 +1,14 @@
+# 复制本文件为 APIserverKey.txt，然后填入你自己的值。
+# 注意：APIserverKey.txt 已被 .gitignore 忽略，请勿提交到 GitHub。
+#
+# 用法（PowerShell）：把下面几行改成你自己的值，然后整段贴进终端执行。
+
+$env:FREQTRADE__EXCHANGE__KEY            = "<你的 OKX API Key>"
+$env:FREQTRADE__EXCHANGE__SECRET         = "<你的 OKX API Secret>"
+$env:FREQTRADE__EXCHANGE__PASSWORD       = "<你的 OKX API Passphrase>"
+$env:FREQTRADE__API_SERVER__PASSWORD     = "<本机 api_server 密码，随机强密码>"
+$env:FREQTRADE__API_SERVER__JWT_SECRET_KEY = "<随机 32 位以上字符串>"
+$env:FREQTRADE__API_SERVER__WS_TOKEN      = "<随机字符串>"
+
+# 只做回测/信号模式时，交易所三行可以留空不设置。
+freqtrade trade --userdir user_data --config user_data/config.json --strategy SampleStrategy

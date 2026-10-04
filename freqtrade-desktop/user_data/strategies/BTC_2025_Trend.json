@@ -1,0 +1,25 @@
+{
+  "strategy_name": "BTC_2025_Trend",
+  "params": {
+    "roi": {},
+    "stoploss": {
+      "stoploss": -0.25
+    },
+    "trailing": {
+      "trailing_stop": true,
+      "trailing_stop_positive": 0.05,
+      "trailing_stop_positive_offset": 0.1,
+      "trailing_only_offset_is_reached": true
+    },
+    "max_open_trades": {
+      "max_open_trades": 3
+    },
+    "buy": {
+      "don": 55
+    },
+    "sell": {},
+    "protection": {}
+  },
+  "ft_stratparam_v": 1,
+  "export_time": "2026-09-13 02:07:55.534038+00:00"
+}

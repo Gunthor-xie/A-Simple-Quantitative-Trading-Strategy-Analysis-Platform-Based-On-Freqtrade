@@ -1,0 +1,55 @@
+# ============================================================
+# Freqtrade Desktop - 只提交"源码 + 配置模板 + 文档"。
+# 规则：机器生成的、下载的、上游安装的，一律不提交。
+# 所有被忽略的文件仍保留在本地磁盘上，只是不进 git。
+# ============================================================
+
+# ---------- 1. 密钥：永远不要提交 ----------
+**/APIserverKey.txt
+**/APIserverKey.local.txt
+**/.env
+**/.env.*
+!**/.env.example
+**/*.vault.json
+
+# ---------- 2. Python 缓存与虚拟环境（可重建） ----------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# ---------- 3. Node / Electron 依赖与构建产物（npm install 重建） ----------
+node_modules/
+dist/
+desktop/.vite/
+
+# ---------- 4. 数据库与日志（运行时自动生成） ----------
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+**/*.log
+
+# ---------- 5. 本地行情 / 回测 / 超参数据（体积大，可由界面或脚本重新生成） ----------
+**/backend/data/
+**/user_data/data/
+**/user_data/logs/
+**/user_data/backtest_results/
+**/user_data/backtest_exports/
+**/user_data/hyperopt_results/
+**/user_data/liquidation/
+**/user_data/factors/
+**/user_data/plot/
+**/user_data/notebooks/
+
+# ---------- 6. 本机专属的 agent 工具（与项目运行无关） ----------
+.agents/
+skills-lock.json
+
+# ---------- 7. 调研时下载的原始缓存（可由脚本重新抓取） ----------
+.scratch/**/raw/
+.scratch/**/raw-web/
