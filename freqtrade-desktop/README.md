@@ -5,7 +5,7 @@ subprocess 调用 freqtrade CLI。重心是**策略回测与分析**（综合评
 K 线指标叠加），同时支持**信号模式**（不需要交易所密钥）以及可显式开启的
 dry-run / OKX 实盘交易。
 
-> 仓库总览、环境要求与免责声明见 [根目录 README](../README.md)。
+> 完整功能说明、架构细节与测试范围见 [freqtrade-desktop/README.md](freqtrade-desktop/README.md)。
 
 ## 环境要求
 
@@ -62,7 +62,7 @@ dev.cmd stop      :: 停止后端与 Vite
 
 项目**不会**把密钥写进配置文件，全部通过环境变量注入：
 
-1. 复制模板：`APIserverKey.example.txt` → `APIserverKey.txt`
+1. 复制模板：`freqtrade-desktop\APIserverKey.example.txt` → `freqtrade-desktop\APIserverKey.txt`
 2. 填入自己的 OKX API Key / Secret / Passphrase 与本机 api_server 密码
 3. 在终端执行该文件中的 `$env:...` 行，再启动服务
 
@@ -70,7 +70,7 @@ dev.cmd stop      :: 停止后端与 Vite
 已被 `.gitignore` 忽略，请勿提交到 GitHub。
 
 桌面端自己保存的连接密码写入系统钥匙串；钥匙串不可用时回退到环境变量
-`FTDESK_SECRET_*`。更多细节见 [user_data/README.md](user_data/README.md)。
+`FTDESK_SECRET_*`。更多细节见 [user_data/README.md](freqtrade-desktop/user_data/README.md)。
 
 ## 目录结构
 
@@ -160,20 +160,6 @@ dev.cmd stop           :: 停止后端 / Vite / 调度器
 HTTP 前缀 `/api/arb`：`/funding`、`/funding/history`、`/funding/amplitude`、`/funding/basis`、
 `/risk`、`/trade/*`、`/positions/*`、`/events`。
 
-## OKX API 配置
-
-1. OKX 网页端 → 头像 → **API** → 创建 Vault API Key（**实盘与模拟盘密钥不通用**）。
-2. 权限只勾 **读取 + 交易**，**绝不要勾提现**；Passphrase 自行设置、之后无法找回；建议绑定 **IP 白名单**。
-3. 两套密钥分别填入应用（权限最小化）：账户只读 → 「账户」页（`okx_read:*`）；套利下单 →
-   「套利机会」→ 交易权限（`okx_trade:*`，需勾风险确认）。
-4. 使用顺序：`paper` 跑通 → 切 `live` 存密钥 → 开启下单 → 先用**模拟盘**验证 → 再切真实盘。
-
-freqtrade bot 走自己的密钥与 REST，与套利模块独立：「设置 → 生成 freqtrade 配置」生成
-`user_data/config.json`；交易所密钥用环境变量注入后启动
-（`FREQTRADE__EXCHANGE__KEY` / `__SECRET` / `__PASSWORD` 与 `FREQTRADE__API_SERVER__PASSWORD`、
-`FREQTRADE__API_SERVER__JWT_SECRET_KEY`），再在「账户 / 信号与交易」页新增连接
-（`http://127.0.0.1:8080`，用户 `Freqtrader`，密码为 `FREQTRADE__API_SERVER__PASSWORD`）。
-
 ## 测试
 
 ```powershell
@@ -181,9 +167,7 @@ cd freqtrade-desktop\backend
 python -m pytest -q
 ```
 
-覆盖评分引擎边界、回测 JSON 解析、BotClient REST 封装、OKX 签名与下单业务拒单（sCode）、
-资金费/基差扫描与决策因子、双腿执行器（仓位计算、先现货后永续、失败回滚、delta/爆仓距离、
-纸面模拟、风控自动平仓）、信号去重与 API 冒烟。
+覆盖评分引擎边界、回测 JSON 解析、BotClient REST 封装、信号去重与 API 冒烟。
 
 ## 安全说明
 
