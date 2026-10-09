@@ -1,13 +1,22 @@
 import { useState } from "react";
 import Backtests from "./pages/Backtests";
 import Account from "./pages/Account";
+import Arbitrage from "./pages/Arbitrage";
 import Charts from "./pages/Charts";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Strategies from "./pages/Strategies";
 import Trading from "./pages/Trading";
 
-type TabKey = "dashboard" | "backtests" | "charts" | "account" | "trading" | "strategies" | "settings";
+type TabKey =
+  | "dashboard"
+  | "backtests"
+  | "charts"
+  | "account"
+  | "trading"
+  | "arbitrage"
+  | "strategies"
+  | "settings";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "dashboard", label: "仪表盘" },
@@ -15,6 +24,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "charts", label: "图表分析" },
   { key: "account", label: "账户" },
   { key: "trading", label: "信号与交易" },
+  { key: "arbitrage", label: "套利机会" },
   { key: "strategies", label: "策略管理" },
   { key: "settings", label: "设置" },
 ];
@@ -48,6 +58,7 @@ export default function App() {
         {tab === "charts" && <Charts />}
         {tab === "account" && <Account />}
         {tab === "trading" && <Trading />}
+        {tab === "arbitrage" && <Arbitrage />}
         {tab === "strategies" && <Strategies />}
         {tab === "settings" && <Settings />}
       </main>

@@ -34,6 +34,7 @@ if "%MODE%"=="" set "MODE=all"
 if /i "%MODE%"=="all" goto :start_all
 if /i "%MODE%"=="backend" goto :start_backend
 if /i "%MODE%"=="web" goto :start_web
+if /i "%MODE%"=="arb" goto :arb
 if /i "%MODE%"=="stop" goto :stop_all
 if /i "%MODE%"=="help" goto :usage
 if /i "%MODE%"=="-h" goto :usage
@@ -114,7 +115,15 @@ if errorlevel 1 (
 )
 call :kill_port %WEB_PORT%
 echo Stopped Vite on port %WEB_PORT%.
+call :stop_arb
 echo The Electron window, if any, closes with the terminal that started it.
+exit /b 0
+
+:arb
+rem  pass the arb sub-action through: arb [start|status|once|stop]
+set "ARB_ACTION=%~2"
+if "%ARB_ACTION%"=="" set "ARB_ACTION=start"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%start-arb.ps1" %ARB_ACTION%
 exit /b 0
 
 :usage
@@ -123,7 +132,8 @@ echo.
 echo   dev.cmd            backend + desktop app window   [default]
 echo   dev.cmd backend    backend only, runs in the background
 echo   dev.cmd web        backend + Vite, use it in the browser
-echo   dev.cmd stop       stop backend and Vite
+echo   dev.cmd arb        arbitrage scheduler [start] (status^|once^|stop)
+echo   dev.cmd stop       stop backend, Vite and the arbitrage scheduler
 echo   dev.cmd help       show this help
 echo.
 echo   backend: http://127.0.0.1:%PORT%   log: %BACKEND_LOG%
@@ -212,6 +222,12 @@ for /l %%I in (1,1,30) do (
     ping -n 2 127.0.0.1 >nul 2>&1
 )
 exit /b 1
+
+rem  stop the arbitrage scheduler that start-arb.ps1 launched (no-op if absent)
+:stop_arb
+powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%start-arb.ps1" stop >nul 2>&1
+ping -n 2 127.0.0.1 >nul 2>&1
+exit /b 0
 
 rem  %~1 = TCP port: stop whatever listens on it, child processes included
 :kill_port

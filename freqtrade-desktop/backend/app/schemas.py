@@ -303,3 +303,86 @@ class JobState(BaseModel):
     message: str = ""
     created_at: str = ""
     finished_at: str | None = None
+
+
+class FundingOpportunity(BaseModel):
+    pair: str
+    symbol: str = ""
+    # --- current funding (cheap: same call already used for filtering) ---
+    funding_rate: float | None = None
+    funding_annualized: float | None = None
+    funding_interval_hours: float = 8.0
+    settlements_per_day: float = 3.0
+    next_settlement_ms: int | None = None
+    next_funding_rate: float | None = None
+    min_funding_rate: float | None = None
+    max_funding_rate: float | None = None
+    premium: float | None = None
+    interest_rate: float | None = None
+    # --- basis (current) + liquidity ---
+    basis_pct: float | None = None
+    adv_usd: float | None = None
+    last_price: float | None = None
+    updated_ms: int | None = None
+    # --- spot availability (a hedge needs a spot leg) ---
+    has_spot: bool = False
+    spot_inst: str | None = None
+    # --- history-derived persistence (one extra call, top rows only) ---
+    history_count: int | None = None
+    funding_mean: float | None = None
+    funding_mean_annualized: float | None = None
+    funding_std: float | None = None
+    streak: int | None = None
+    reversal_freq: float | None = None
+    half_life: float | None = None
+    source: str = "okx-live"
+    note: str = ""
+
+
+class FundingBasisStats(BaseModel):
+    pair: str
+    inst_perp: str = ""
+    inst_index: str = ""
+    count: int = 0
+    current: float | None = None
+    mean: float | None = None
+    volatility: float | None = None
+    percentile: float | None = None
+    min: float | None = None
+    max: float | None = None
+    max_abs: float | None = None
+    half_life: float | None = None
+
+
+class FundingPoint(BaseModel):
+    time: int
+    rate: float
+    annualized: float
+    basis_pct: float | None = None
+
+
+class FundingHistory(BaseModel):
+    pair: str
+    interval_hours: float = 8.0
+    settlements_per_day: float = 3.0
+    points: list[FundingPoint] = Field(default_factory=list)
+
+
+class FundingScanResult(BaseModel):
+    generated_ms: int = 0
+    count: int = 0
+    source: str = "okx-live"
+    items: list[FundingOpportunity] = Field(default_factory=list)
+
+
+class ArbRiskSettings(BaseModel):
+    """Position risk-check thresholds and the fee assumption (all editable).
+
+    Values are accepted as-is so the UI can flag out-of-range entries in red
+    rather than silently rejecting them; only non-positive thresholds - which
+    would disable the checks entirely - are refused.
+    """
+
+    warn_liq_distance_pct: float = Field(default=0.12, gt=0)
+    max_delta_pct: float = Field(default=0.03, gt=0)
+    fee_bps: float = Field(default=5.0, ge=0)

@@ -341,6 +341,21 @@ th {
   color: var(--muted);
 }
 
+/* Sortable table header: cycles 升序 / 降序 / 不排序 */
+.sort-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sort-btn:hover {
+  color: var(--accent);
+}
+
 .row {
   display: flex;
   align-items: center;

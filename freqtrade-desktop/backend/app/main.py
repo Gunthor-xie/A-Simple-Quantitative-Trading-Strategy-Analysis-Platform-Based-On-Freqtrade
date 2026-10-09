@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import api, okx, ws
+from .routers import api, arbitrage, okx, ws
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -34,6 +34,7 @@ app.add_middleware(
 
 app.include_router(api.router)
 app.include_router(okx.router)
+app.include_router(arbitrage.router)
 app.include_router(ws.router)
 
 

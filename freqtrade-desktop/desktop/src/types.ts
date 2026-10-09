@@ -239,3 +239,173 @@ export interface BackendHealth {
   version: string;
   features: string[];
 }
+
+export interface FundingOpportunity {
+  pair: string;
+  symbol: string;
+  funding_rate: number | null;
+  funding_annualized: number | null;
+  funding_interval_hours: number;
+  settlements_per_day: number;
+  next_settlement_ms: number | null;
+  next_funding_rate: number | null;
+  min_funding_rate: number | null;
+  max_funding_rate: number | null;
+  premium: number | null;
+  interest_rate: number | null;
+  basis_pct: number | null;
+  adv_usd: number | null;
+  last_price: number | null;
+  updated_ms: number | null;
+  has_spot: boolean;
+  spot_inst: string | null;
+  history_count: number | null;
+  funding_mean: number | null;
+  funding_mean_annualized: number | null;
+  funding_std: number | null;
+  streak: number | null;
+  reversal_freq: number | null;
+  half_life: number | null;
+  source: string;
+  note: string;
+}
+
+export interface FundingBasisStats {
+  pair: string;
+  inst_perp: string;
+  inst_index: string;
+  count: number;
+  current: number | null;
+  mean: number | null;
+  volatility: number | null;
+  percentile: number | null;
+  min: number | null;
+  max: number | null;
+  max_abs: number | null;
+  half_life: number | null;
+}
+
+export interface FundingScanResult {
+  generated_ms: number;
+  count: number;
+  source: string;
+  items: FundingOpportunity[];
+}
+
+export interface FundingPoint {
+  time: number;
+  rate: number;
+  annualized: number;
+  basis_pct?: number | null;
+}
+
+export interface FundingHistory {
+  pair: string;
+  interval_hours: number;
+  settlements_per_day: number;
+  points: FundingPoint[];
+}
+
+export interface FundingAmplitude {
+  pair: string;
+  inst_id: string;
+  days: number;
+  from: string | null;
+  to: string | null;
+  max_daily_amplitude: number;
+  max_amplitude_date: string | null;
+  avg_daily_amplitude: number;
+  suggested_leverage: number;
+  rule: string;
+}
+
+export interface ArbPlanPreview {
+  pair: string;
+  symbol: string;
+  direction: string;
+  inst_spot: string;
+  inst_perp: string;
+  spot_side: string;
+  perp_side: string;
+  spot_qty: number;
+  perp_contracts: number;
+  spot_price: number;
+  perp_price: number;
+  ct_val: number;
+  spot_notional: number;
+  perp_notional: number;
+  leverage: number;
+  fee_bps: number;
+  funding_annualized: number;
+  round_trip_fee: number;
+  expected_annual: number;
+  suggested_leverage: number | null;
+  max_daily_amplitude: number | null;
+  leverage_ok: boolean | null;
+}
+
+export interface ArbRiskSettings {
+  warn_liq_distance_pct: number;
+  max_delta_pct: number;
+  fee_bps: number;
+}
+
+export interface ArbTradeStatus {
+  configured: boolean;
+  enabled: boolean;
+  demo: boolean;
+  mode: "paper" | "live";
+}
+
+export interface ArbPosition {
+  id: number;
+  pair: string;
+  symbol: string;
+  inst_spot: string;
+  inst_perp: string;
+  direction: string;
+  status: "opening" | "open" | "closing" | "closed" | "error";
+  notional_usd: number;
+  spot_qty: number;
+  perp_contracts: number;
+  ct_val: number;
+  leverage: number | null;
+  spot_entry_px: number | null;
+  perp_entry_px: number | null;
+  spot_close_px: number | null;
+  perp_close_px: number | null;
+  realized_pnl: number;
+  funding_accrued: number;
+  delta_usd: number | null;
+  liq_distance_pct: number | null;
+  mark_px: number | null;
+  demo: number;
+  note: string | null;
+  created_at: string;
+  updated_at: string | null;
+  closed_at: string | null;
+}
+
+export interface ArbLeg {
+  id: number;
+  position_id: number;
+  kind: string;
+  inst_id: string;
+  side: string;
+  ordertype: string;
+  sz: number | null;
+  px: number | null;
+  ord_id: string | null;
+  status: string;
+  detail: string | null;
+  created_at: string;
+}
+
+export interface ArbEvent {
+  id: number;
+  position_id: number | null;
+  level: string;
+  event: string;
+  detail: string | null;
+  created_at: string;
+}

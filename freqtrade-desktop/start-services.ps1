@@ -8,6 +8,10 @@
 #
 # NOTE: keep this file ASCII-only (Windows PowerShell 5.1 misreads UTF-8 no-BOM
 # scripts containing CJK characters).
+param(
+    [switch]$WithArb
+)
+
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -64,3 +68,8 @@ Write-Host "Backend:  http://127.0.0.1:8766  (api/health)"
 Write-Host "Frontend: http://127.0.0.1:5173"
 Write-Host "Logs: backend\data\backend-services.log , desktop\vite-services.log"
 Write-Host "Stop hint: Stop-Process -Id (Get-NetTCPConnection -LocalPort 8766).OwningProcess -Force"
+
+if ($WithArb) {
+    Write-Host "Starting the arbitrage scheduler (no-op until ordering is enabled in the UI) ..."
+    & (Join-Path $root "start-arb.ps1") start
+}

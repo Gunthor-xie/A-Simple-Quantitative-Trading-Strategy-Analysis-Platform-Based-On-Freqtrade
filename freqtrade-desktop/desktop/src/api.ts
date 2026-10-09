@@ -1,10 +1,20 @@
 import type {
+  ArbEvent,
+  ArbLeg,
+  ArbPlanPreview,
+  ArbPosition,
+  ArbRiskSettings,
+  ArbTradeStatus,
   BacktestRun,
   AppSettings,
   BackendHealth,
   ChartData,
   ConnectionOut,
   ConnectionTestResult,
+  FundingAmplitude,
+  FundingBasisStats,
+  FundingHistory,
+  FundingScanResult,
   JobState,
   ScoreReport,
   ScoreWeights,
@@ -110,6 +120,57 @@ export const api = {
   okxCredentials: (body: unknown) => post<{ ok: boolean; configured: boolean }>("/api/okx/credentials", body),
   okxSummary: () => get<Record<string, unknown>>("/api/okx/summary"),
   okxReconcile: (payload: unknown) => post<Record<string, unknown>>("/api/okx/reconcile", payload),
+  arbFunding: (params?: { limit?: number; min_volume_usd?: number; require_spot?: boolean }) => {
+    const qs = new URLSearchParams();
+    if (params?.limit) qs.set("limit", String(params.limit));
+    if (params?.min_volume_usd !== undefined) qs.set("min_volume_usd", String(params.min_volume_usd));
+    if (params?.require_spot !== undefined) qs.set("require_spot", String(params.require_spot));
+    const q = qs.toString();
+    return get<FundingScanResult>(`/api/arb/funding${q ? `?${q}` : ""}`);
+  },
+  arbFundingHistory: (pair: string, days = 90) =>
+    get<FundingHistory>(
+      `/api/arb/funding/history?pair=${encodeURIComponent(pair)}&days=${days}`,
+    ),
+  arbFundingAmplitude: (pair: string, days = 730) =>
+    get<FundingAmplitude>(
+      `/api/arb/funding/amplitude?pair=${encodeURIComponent(pair)}&days=${days}`,
+    ),
+  arbFundingBasis: (pair: string, days = 365) =>
+    get<FundingBasisStats>(
+      `/api/arb/funding/basis?pair=${encodeURIComponent(pair)}&days=${days}`,
+    ),
+  arbRisk: () => get<ArbRiskSettings>("/api/arb/risk"),
+  arbPutRisk: (body: ArbRiskSettings) => put<ArbRiskSettings>("/api/arb/risk", body),
+  arbTradeStatus: () => get<ArbTradeStatus>("/api/arb/trade/status"),
+  arbTradeCredentials: (body: unknown) =>
+    post<{ ok: boolean; configured: boolean }>("/api/arb/trade/credentials", body),
+  arbTradeClearCredentials: () =>
+    del<{ ok: boolean; configured: boolean; enabled: boolean }>("/api/arb/trade/credentials"),
+  arbTradeSettings: (body: { enabled?: boolean; demo?: boolean; mode?: "paper" | "live" }) =>
+    post<{ enabled: boolean; demo: boolean; mode: string }>("/api/arb/trade/settings", body),
+  arbTradeAccount: () =>
+    get<{ config: Record<string, unknown>; balance: unknown[]; positions: unknown[] }>(
+      "/api/arb/trade/account",
+    ),
+  arbTradeLeverage: (body: unknown) => post<unknown>("/api/arb/trade/leverage", body),
+  arbTradePositionMode: (posMode: string) =>
+    post<unknown>("/api/arb/trade/position-mode", { pos_mode: posMode }),
+  arbTradeOrder: (body: unknown) => post<unknown>("/api/arb/trade/order", body),
+  arbTradeCancel: (body: unknown) => post<unknown>("/api/arb/trade/cancel", body),
+  arbPositions: (status?: string) =>
+    get<{ positions: ArbPosition[] }>(`/api/arb/positions${status ? `?status=${status}` : ""}`),
+  arbPosition: (id: number) =>
+    get<{ position: ArbPosition; legs: ArbLeg[]; events: ArbEvent[] }>(`/api/arb/positions/${id}`),
+  arbPlan: (body: unknown) => post<ArbPlanPreview>("/api/arb/positions/plan", body),
+  arbOpen: (body: unknown) => post<ArbPosition>("/api/arb/positions/open", body),
+  arbClose: (id: number) => post<ArbPosition>(`/api/arb/positions/${id}/close`, { confirm: true }),
+  arbRefreshPosition: (id: number) => post<ArbPosition>(`/api/arb/positions/${id}/refresh`),
+  arbUnwind: () => post<{ unwound: unknown[] }>("/api/arb/positions/unwind"),
+  arbEvents: (positionId?: number) =>
+    get<{ events: ArbEvent[] }>(
+      `/api/arb/events${positionId ? `?position_id=${positionId}` : ""}`,
+    ),
   settingsStatus: () => get<SettingsStatus>("/api/settings/status"),
   health: () => get<BackendHealth>("/api/health"),
   strategies: () => get<StrategyInfo[]>("/api/strategies"),

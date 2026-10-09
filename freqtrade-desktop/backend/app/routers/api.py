@@ -225,6 +225,7 @@ def health() -> dict[str, Any]:
             "proxy_setting",
             "timeframe_detail",
             "local_chart_inventory",
+            "funding_arb",
         ],
     }
 

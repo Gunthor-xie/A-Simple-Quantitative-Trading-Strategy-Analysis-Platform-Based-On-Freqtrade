@@ -87,7 +87,71 @@ class Database:
                     created_at TEXT NOT NULL,
                     finished_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS arb_positions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    pair TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    inst_spot TEXT NOT NULL,
+                    inst_perp TEXT NOT NULL,
+                    direction TEXT NOT NULL DEFAULT 'long_spot_short_perp',
+                    status TEXT NOT NULL DEFAULT 'opening',
+                    notional_usd REAL NOT NULL DEFAULT 0,
+                    spot_qty REAL NOT NULL DEFAULT 0,
+                    perp_contracts REAL NOT NULL DEFAULT 0,
+                    ct_val REAL NOT NULL DEFAULT 0,
+                    leverage REAL,
+                    spot_entry_px REAL,
+                    perp_entry_px REAL,
+                    spot_close_px REAL,
+                    perp_close_px REAL,
+                    realized_pnl REAL NOT NULL DEFAULT 0,
+                    funding_accrued REAL NOT NULL DEFAULT 0,
+                    delta_usd REAL,
+                    liq_distance_pct REAL,
+                    mark_px REAL,
+                    demo INTEGER NOT NULL DEFAULT 1,
+                    note TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT,
+                    closed_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS arb_legs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    position_id INTEGER NOT NULL,
+                    kind TEXT NOT NULL,
+                    inst_id TEXT NOT NULL,
+                    side TEXT NOT NULL,
+                    ordertype TEXT NOT NULL,
+                    sz REAL,
+                    px REAL,
+                    ord_id TEXT,
+                    status TEXT NOT NULL DEFAULT 'placed',
+                    detail TEXT,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS arb_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    position_id INTEGER,
+                    level TEXT NOT NULL DEFAULT 'info',
+                    event TEXT NOT NULL,
+                    detail TEXT,
+                    created_at TEXT NOT NULL
+                );
                 """
+            )
+            self._migrate(db)
+
+    def _migrate(self, db: sqlite3.Connection) -> None:
+        """Add columns introduced after a table first shipped.
+
+        ``CREATE TABLE IF NOT EXISTS`` does not alter an existing table, so new
+        columns need an explicit, idempotent ``ALTER TABLE``.
+        """
+        existing = {row["name"] for row in db.execute("PRAGMA table_info(arb_positions)")}
+        if "direction" not in existing:
+            db.execute(
+                "ALTER TABLE arb_positions ADD COLUMN direction TEXT NOT NULL "
+                "DEFAULT 'long_spot_short_perp'"
             )
 
     # ---- connections ----
@@ -346,6 +410,117 @@ class Database:
             rows = db.execute(
                 "SELECT * FROM jobs ORDER BY created_at DESC LIMIT ?", (limit,)
             ).fetchall()
+        return [dict(r) for r in rows]
+
+    # ---- arbitrage (delta-neutral funding/basis positions) ----
+
+    _ARB_POSITION_FIELDS = {
+        "pair", "symbol", "inst_spot", "inst_perp", "direction", "status",
+        "notional_usd", "spot_qty", "perp_contracts", "ct_val", "leverage",
+        "spot_entry_px", "perp_entry_px", "spot_close_px", "perp_close_px",
+        "realized_pnl", "funding_accrued", "delta_usd", "liq_distance_pct",
+        "mark_px", "demo", "note", "updated_at", "closed_at",
+    }
+
+    def create_arb_position(self, data: dict[str, Any]) -> int:
+        fields = {k: v for k, v in data.items() if k in self._ARB_POSITION_FIELDS}
+        fields.setdefault("created_at", _now())
+        columns = ", ".join(fields)
+        placeholders = ", ".join("?" for _ in fields)
+        with self.conn() as db:
+            cur = db.execute(
+                f"INSERT INTO arb_positions ({columns}) VALUES ({placeholders})",
+                list(fields.values()),
+            )
+            return int(cur.lastrowid)
+
+    def update_arb_position(self, position_id: int, **fields: Any) -> None:
+        updates = {k: v for k, v in fields.items() if k in self._ARB_POSITION_FIELDS}
+        if not updates:
+            return
+        updates["updated_at"] = _now()
+        assignments = ", ".join(f"{k} = ?" for k in updates)
+        with self.conn() as db:
+            db.execute(
+                f"UPDATE arb_positions SET {assignments} WHERE id = ?",
+                [*updates.values(), position_id],
+            )
+
+    def get_arb_position(self, position_id: int) -> dict[str, Any] | None:
+        with self.conn() as db:
+            row = db.execute(
+                "SELECT * FROM arb_positions WHERE id = ?", (position_id,)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def list_arb_positions(
+        self, status: str | None = None, limit: int = 200
+    ) -> list[dict[str, Any]]:
+        with self.conn() as db:
+            if status:
+                rows = db.execute(
+                    "SELECT * FROM arb_positions WHERE status = ? ORDER BY id DESC LIMIT ?",
+                    (status, limit),
+                ).fetchall()
+            else:
+                rows = db.execute(
+                    "SELECT * FROM arb_positions ORDER BY id DESC LIMIT ?", (limit,)
+                ).fetchall()
+        return [dict(r) for r in rows]
+
+    def insert_arb_leg(self, position_id: int, data: dict[str, Any]) -> int:
+        with self.conn() as db:
+            cur = db.execute(
+                """
+                INSERT INTO arb_legs
+                    (position_id, kind, inst_id, side, ordertype, sz, px, ord_id, status, detail, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    position_id,
+                    data.get("kind", ""),
+                    data.get("inst_id", ""),
+                    data.get("side", ""),
+                    data.get("ordertype", ""),
+                    data.get("sz"),
+                    data.get("px"),
+                    data.get("ord_id"),
+                    data.get("status", "placed"),
+                    data.get("detail"),
+                    data.get("created_at") or _now(),
+                ),
+            )
+            return int(cur.lastrowid)
+
+    def list_arb_legs(self, position_id: int) -> list[dict[str, Any]]:
+        with self.conn() as db:
+            rows = db.execute(
+                "SELECT * FROM arb_legs WHERE position_id = ? ORDER BY id", (position_id,)
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def add_arb_event(
+        self, position_id: int | None, event: str, level: str = "info", detail: str = ""
+    ) -> None:
+        with self.conn() as db:
+            db.execute(
+                "INSERT INTO arb_events (position_id, level, event, detail, created_at) VALUES (?, ?, ?, ?, ?)",
+                (position_id, level, event, detail, _now()),
+            )
+
+    def list_arb_events(
+        self, position_id: int | None = None, limit: int = 200
+    ) -> list[dict[str, Any]]:
+        with self.conn() as db:
+            if position_id is not None:
+                rows = db.execute(
+                    "SELECT * FROM arb_events WHERE position_id = ? ORDER BY id DESC LIMIT ?",
+                    (position_id, limit),
+                ).fetchall()
+            else:
+                rows = db.execute(
+                    "SELECT * FROM arb_events ORDER BY id DESC LIMIT ?", (limit,)
+                ).fetchall()
         return [dict(r) for r in rows]
 
 
